@@ -56,20 +56,21 @@ class ThreeDMountainCarEnv(gym.Env):
 
         position_x, position_y, velocity_x, velocity_y = self.state
         if action == 0: # neutral
-            velocity_x = math.cos(3*position_x)*(-0.0025)
-            velocity_y = math.cos(3*position_y)*(-0.0025)
+            velocity_x += math.cos(3*position_x)*(-0.0025)
+            velocity_y += math.cos(3*position_y)*(-0.0025)
         elif action == 1: # left x, west
-            velocity_x = math.cos(3*position_x)*(-0.0025) - 0.001
-            velocity_y = math.cos(3*position_y)*(-0.0025)
+            velocity_x += math.cos(3*position_x)*(-0.0025) - 0.001
+            velocity_y += math.cos(3*position_y)*(-0.0025)
         elif action == 2: # right x, east
-            velocity_x = math.cos(3*position_x)*(-0.0025) + 0.001
-            velocity_y = math.cos(3*position_y)*(-0.0025)
+            velocity_x += math.cos(3*position_x)*(-0.0025) + 0.001
+            velocity_y += math.cos(3*position_y)*(-0.0025)
         elif action == 3: # left y, south
-            velocity_x = math.cos(3*position_x)*(-0.0025)
-            velocity_y = math.cos(3*position_y)*(-0.0025) - 0.001
+            velocity_x += math.cos(3*position_x)*(-0.0025)
+            velocity_y += math.cos(3*position_y)*(-0.0025) - 0.001
         elif action == 4:
-            velocity_x = math.cos(3*position_x)*(-0.0025)
-            velocity_y = math.cos(3*position_y)*(-0.0025) + 0.001
+            velocity_x += math.cos(3*position_x)*(-0.0025)
+            velocity_y += math.cos(3*position_y)*(-0.0025) + 0.001
+
 
         velocity_x = np.clip(velocity_x, -self.max_speed_x, self.max_speed_x)
         velocity_y = np.clip(velocity_y, -self.max_speed_y, self.max_speed_y)
@@ -87,6 +88,7 @@ class ThreeDMountainCarEnv(gym.Env):
             velocity_y = 0
 
         done = bool(position_x >= self.goal_position and position_y >= self.goal_position)
+        # done = bool(position_x >= self.goal_position)
 
         reward = -1.0
 

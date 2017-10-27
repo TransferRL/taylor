@@ -76,7 +76,7 @@ class Estimator():
 
 class QLearning():
 
-    def __init__(self, env):
+    def __init__(self, env, rendering=False):
         # Feature Preprocessing: Normalize to zero mean and unit variance
         # We use a few samples from the observation space to do this
         observation_examples = np.array([env.observation_space.sample() for x in range(10000)])
@@ -95,6 +95,8 @@ class QLearning():
 
         self.estimator = Estimator(env, scaler, featurizer)
         self.env = env
+        self.replay_memory = None
+        self.rendering = rendering
 
 
     def make_epsilon_greedy_policy(self, estimator, epsilon, nA):
@@ -208,22 +210,29 @@ class QLearning():
 
 
     def play(self):
+        self.replay_memory = [] # reset
         done = 0
         policy = self.make_epsilon_greedy_policy(self.estimator, 0, self.env.action_space.n)
         state = self.env.reset()
-        for i_episode in range(100000):
+        for t in range(100000):
             action_probs = policy(state)
             action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             next_state, reward, done, info = self.env.step(action)
-            self.env.render()
+
+            self.replay_memory.append((state, action, next_state))
+
+            if self.rendering:
+                self.env.render()
+
             if done:
                 print('done: {}'.format(state))
-            #     plt.figure()
-            #     plt.imshow(env.render(mode='rgb_array'))
-                # break
+                break
+                #     plt.figure()
+                #     plt.imshow(env.render(mode='rgb_array'))
+                    # break
             state = next_state
 
-
+        return self.replay_memory
 
 
 

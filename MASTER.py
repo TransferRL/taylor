@@ -6,7 +6,10 @@ import tensorflow as tf
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
 import lib.QLearning as ql
 import lib.RandomAction
+import lib.env.mountain_car
 import matplotlib.pyplot as plt
+
+#### TODO: do batch norm for the neural nets
 
 # Parameters
 learning_rate = 0.1
@@ -51,7 +54,7 @@ def neural_net(x):
 logits = neural_net(X)
 
 # Define loss and optimizer
-loss_op = tf.reduce_mean(tf.abs(logits - Y))
+loss_op = tf.square(tf.reduce_mean(tf.abs(logits - Y)))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(loss_op)
 
@@ -64,19 +67,20 @@ init = tf.global_variables_initializer()
 
 
 # get envs
-mc2d_env = gym.envs.make("MountainCar-v0")
+mc2d_env = lib.env.mountain_car.MountainCarEnv()
 mc3d_env = ThreeDMountainCarEnv()
 
 # train source task
-# qlearning_2d = ql.QLearning(mc2d_env)
-# qlearning_2d.learn()
-# dsource = qlearning_2d.play()
+qlearning_2d = ql.QLearning(mc2d_env)
+qlearning_2d.learn()
+dsource = qlearning_2d.play()
 # print(dsource)
 
 # do random action for target task
 random_action_3d = lib.RandomAction.RandomAction(mc3d_env)
 dtarget = random_action_3d.play()
 # print(dtarget)
+
 
 # approximate the one-step transition model
 # Define the input function for training
@@ -120,21 +124,83 @@ with tf.Session() as sess:
             loss.append(loss_train)
 
     print("Optimization Finished!")
-    # plot training loss
-    plt.plot(loss)
-    plt.show()
 
     # test set
     loss_test = sess.run(loss_op, feed_dict={X: dsa_test, Y: dns_test})
     print("test loss is {}".format(loss_test))
 
+    # plot training loss
+    # plt.plot(loss)
+    # plt.show()
+
+    # Find the mapping between source and target
+    mc2d_states = mc2d_env.observation_space.shape[0] # 2
+    mc3d_states = mc3d_env.observation_space.shape[0] # 4
+    mc2d_actions = mc2d_env.action_space.n # 3
+    mc3d_actions = mc3d_env.action_space.n # 5
+
+    mse_state_mappings = np.zeros((2,)*mc3d_states) # 2 by 2 by 2 by 2
+    mse_action_mappings = np.ndarray(shape=(mc3d_actions,mc2d_actions, mc3d_states*mc3d_states)) # 5 by 3 by 16
+    mse_action_mappings.fill(0)
+
+    state_count = 0
+    for s0 in range(mc2d_states): # s0 is the first state of target states, x
+        for s1 in range(mc2d_states): # s1 is second state of target states, y
+            for s2 in range(mc2d_states):  # s2 is third state of target states, x_dot
+                for s3 in range(mc2d_states):  # s3 is fourth state of target states, y_dot
+
+                    state_losses = []
+
+                    for a_mc3d in range(mc3d_actions):
+                        for a_mc2d in range(mc2d_actions):
+                            states = np.array([x[0] for x in dsource if x[1]==a_mc2d])
+                            actions = np.array([x[1] for x in dsource if x[1] == a_mc2d])
+                            n_states = np.array([x[2] for x in dsource if x[1]==a_mc2d])
+
+                            if (states.size==0) or (actions.size==0) or (n_states.size==0):
+                                print('this happened..') # TODO
+                                mse_action_mappings[a_mc3d, a_mc2d, state_count] = 0
+                                continue
+
+                            # transform to dsource_trans
+                            actions_trans = np.ndarray(shape=(actions.size,))
+                            actions_trans.fill(a_mc3d)
+                            input_trans = np.array([states[:, s0], states[:, s1], states[:, s2], states[:, s3], actions_trans]).T
+                            # input_trans = [states_trans, actions]
+                            n_states_trans = np.array([n_states[:,s0], n_states[:,s1], n_states[:,s2], n_states[:,s3]]).T
+
+                            # calculate mapping error
+                            loss_mapping = sess.run(loss_op, feed_dict={X: input_trans, Y: n_states_trans})
+                            # print('loss_mapping is {}'.format(loss_mapping))
+
+                            state_losses.append(loss_mapping)
+                            mse_action_mappings[a_mc3d, a_mc2d, state_count] = loss_mapping
+
+                    mse_state_mappings[s0, s1, s2, s3] = np.mean(state_losses)
+                    state_count += state_count
+
+    mse_action_mappings_result = [[np.mean(mse_action_mappings[a_mc3d, a_mc2d, :]) for a_mc3d in range(mc3d_actions)] for a_mc2d in range(mc2d_actions)]
+
+    print('action mapping: {}'.format(mse_action_mappings_result))
+    print('state mapping {}'.format(mse_state_mappings))
 
 
-
-
-
-
-
+    print('x,x,x,x: {}'.format(mse_state_mappings[0][0][0][0]))
+    print('x,x,x,x_dot: {}'.format(mse_state_mappings[0][0][0][1]))
+    print('x,x,x_dot,x: {}'.format(mse_state_mappings[0][0][1][0]))
+    print('x,x,x_dot,x_dot: {}'.format(mse_state_mappings[0][0][1][1]))
+    print('x,x_dot,x,x: {}'.format(mse_state_mappings[0][1][0][0]))
+    print('x,x_dot,x,x_dot: {}'.format(mse_state_mappings[0][1][0][1]))
+    print('x,x_dot,x_dot,x: {}'.format(mse_state_mappings[0][1][1][0]))
+    print('x,x_dot,x_dot,x_dot: {}'.format(mse_state_mappings[0][1][1][1]))
+    print('x_dot,x,x,x: {}'.format(mse_state_mappings[1][0][0][0]))
+    print('x_dot,x,x,x_dot: {}'.format(mse_state_mappings[1][0][1][0]))
+    print('x_dot,x,x_dot,x: {}'.format(mse_state_mappings[1][0][1][1]))
+    print('x_dot,x,x_dot,x_dot: {}'.format(mse_state_mappings[1][1][0][0]))
+    print('x_dot,x_dot,x,x: {}'.format(mse_state_mappings[1][0][0][1]))
+    print('x_dot,x_dot,x,x_dot: {}'.format(mse_state_mappings[1][1][0][1]))
+    print('x_dot,x_dot,x_dot,x: {}'.format(mse_state_mappings[1][1][1][0]))
+    print('x_dot,x_dot,x_dot,x_dot: {}'.format(mse_state_mappings[1][1][1][1]))
 
 
 

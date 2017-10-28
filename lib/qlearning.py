@@ -206,13 +206,13 @@ class QLearning():
 
 
     def learn(self):
-        self.q_learning(self.env, self.estimator, 100, epsilon=0.0)
+        self.q_learning(self.env, self.estimator, 100, epsilon=0.3)
 
 
     def play(self):
         self.replay_memory = [] # reset
-        done = 0
-        policy = self.make_epsilon_greedy_policy(self.estimator, 0, self.env.action_space.n)
+        # done = 0
+        policy = self.make_epsilon_greedy_policy(self.estimator, 0.3, self.env.action_space.n) #TODO: jm: is this the best way?
         state = self.env.reset()
         for t in range(100000):
             action_probs = policy(state)
@@ -225,7 +225,7 @@ class QLearning():
                 self.env.render()
 
             if done:
-                print('done: {}'.format(state))
+                print('done: {}'.format(next_state))
                 break
                 #     plt.figure()
                 #     plt.imshow(env.render(mode='rgb_array'))

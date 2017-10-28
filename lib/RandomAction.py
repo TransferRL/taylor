@@ -11,7 +11,7 @@ class RandomAction():
         for t in range(100000):
             action = self.env.action_space.sample()
             next_state, reward, done, info = self.env.step(action)
-            self.replay_memory.append((state, action, next_state))
+            self.replay_memory.append([state, action, next_state])
 
             if done:
                 break

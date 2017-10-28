@@ -219,7 +219,7 @@ class QLearning():
             action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             next_state, reward, done, info = self.env.step(action)
 
-            self.replay_memory.append((state, action, next_state))
+            self.replay_memory.append([state, action, next_state])
 
             if self.rendering:
                 self.env.render()

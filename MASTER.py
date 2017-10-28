@@ -71,11 +71,13 @@ mc2d_env = lib.env.mountain_car.MountainCarEnv()
 mc3d_env = ThreeDMountainCarEnv()
 
 # train source task
-# qlearning_2d = ql.QLearning(mc2d_env)
-# qlearning_2d.learn()
-# dsource = qlearning_2d.play()
-random_action_2d = lib.RandomAction.RandomAction(mc2d_env)
-dsource = random_action_2d.play()
+qlearning_2d = ql.QLearning(mc2d_env)
+qlearning_2d.learn()
+dsource = qlearning_2d.play()
+
+# 2d random
+# random_action_2d = lib.RandomAction.RandomAction(mc2d_env)
+# dsource = random_action_2d.play()
 
 
 # print(dsource)
@@ -163,7 +165,7 @@ with tf.Session() as sess:
 
                             if (states.size==0) or (actions.size==0) or (n_states.size==0):
                                 print('this happened..') # TODO
-                                mse_action_mappings[a_mc3d, a_mc2d, state_count] = 0
+                                # mse_action_mappings[a_mc3d, a_mc2d, state_count] = 0
                                 continue
 
                             # transform to dsource_trans
@@ -181,7 +183,7 @@ with tf.Session() as sess:
                             mse_action_mappings[a_mc3d, a_mc2d, state_count] = loss_mapping
 
                     mse_state_mappings[s0, s1, s2, s3] = np.mean(state_losses)
-                    state_count += state_count
+                    state_count += 1
 
     # mse_action_mappings_result = [[np.mean(mse_action_mappings[a_mc3d, a_mc2d, :]) for a_mc2d in range(mc2d_actions)] for a_mc3d in range(mc3d_actions)]
 
@@ -191,7 +193,7 @@ with tf.Session() as sess:
             losses_act = []
             for s in range(mc3d_states*mc3d_states):
                 if mse_action_mappings[a_mc3d, a_mc2d, s] != -1:
-                    print(mse_action_mappings[a_mc3d, a_mc2d, s])
+                    # print(mse_action_mappings[a_mc3d, a_mc2d, s])
                     losses_act.append(mse_action_mappings[a_mc3d, a_mc2d, s])
             mse_action_mappings_result[a_mc3d, a_mc2d] = np.mean(losses_act)
 

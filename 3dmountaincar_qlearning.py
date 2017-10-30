@@ -216,6 +216,7 @@ for i_episode in range(100000):
     action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
     next_state, reward, done, info = env.step(action)
     env.render()
+    env.render_y()
     if done:
         print('done: {}'.format(state))
     #     plt.figure()

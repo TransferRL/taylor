@@ -11,7 +11,8 @@ state = env.reset()
 for t in itertools.count():
 	# action = env.action_space.sample()
 	next_state, reward, done, info = env.step(2)
-	env.render()
+	env.render() # yellow
+	env.render_y() #cyan
 
 	if done:
 		break

@@ -39,7 +39,8 @@ class ThreeDMountainCarEnv(gym.Env):
         self.low = np.array([self.min_position_x, self.min_position_y, -self.max_speed_x, -self.max_speed_y]) # jm: x,y,x_dot,y_dot
         self.high = np.array([self.max_position_x, self.max_position_y, self.max_speed_x, self.max_speed_y]) # jm: x,y,x_dot,y_dot
 
-        self.viewer = None
+        self.viewer_x = None
+        self.viewer_y = None
 
         self.action_space = spaces.Discrete(5) # jm: {Neutral, West, East, South, North}
         self.observation_space = spaces.Box(self.low, self.high)
@@ -108,24 +109,26 @@ class ThreeDMountainCarEnv(gym.Env):
 
 
     def _render(self, mode='human', close=False):
-        # jm: only showing x positions for now.. More too add..
         if close:
-            if self.viewer is not None:
-                self.viewer.close()
-                self.viewer = None
+            if self.viewer_x is not None:
+                self.viewer_x.close()
+                self.viewer_x = None
+            if self.viewer_y is not None:
+                self.viewer_y.close()
+                self.viewer_y = None
             return
 
         screen_width = 600
         screen_height = 400
 
-        world_width = self.max_position_x - self.min_position_x
+        world_width = self.max_position_x - self.min_position_x # same for y
         scale = screen_width/world_width
         carwidth=40
         carheight=20
 
-        if self.viewer is None:
+        if self.viewer_x is None:
             from gym.envs.classic_control import rendering
-            self.viewer = rendering.Viewer(screen_width, screen_height)
+            self.viewer_x = rendering.Viewer(screen_width, screen_height)
             xs = np.linspace(self.min_position_x, self.max_position_x, 100)
             # ys = np.linspace(self.min_position_y, self.max_position_y, 100)
             # ys = np.zeros(100)
@@ -134,40 +137,107 @@ class ThreeDMountainCarEnv(gym.Env):
 
             self.track = rendering.make_polyline(xyzs)
             self.track.set_linewidth(4)
-            self.viewer.add_geom(self.track)
+            self.viewer_x.add_geom(self.track)
 
             clearance = 10
 
             l,r,t,b = -carwidth/2, carwidth/2, carheight, 0
             car = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
             car.add_attr(rendering.Transform(translation=(0, clearance)))
-            self.cartrans = rendering.Transform()
-            car.add_attr(self.cartrans)
-            self.viewer.add_geom(car)
+            self.cartrans_x = rendering.Transform()
+            car.add_attr(self.cartrans_x)
+            self.viewer_x.add_geom(car)
             frontwheel = rendering.make_circle(carheight/2.5)
             frontwheel.set_color(.5, .5, .5)
             frontwheel.add_attr(rendering.Transform(translation=(carwidth/4,clearance)))
-            frontwheel.add_attr(self.cartrans)
-            self.viewer.add_geom(frontwheel)
+            frontwheel.add_attr(self.cartrans_x)
+            self.viewer_x.add_geom(frontwheel)
             backwheel = rendering.make_circle(carheight/2.5)
             backwheel.add_attr(rendering.Transform(translation=(-carwidth/4,clearance)))
-            backwheel.add_attr(self.cartrans)
+            backwheel.add_attr(self.cartrans_x)
             backwheel.set_color(.5, .5, .5)
-            self.viewer.add_geom(backwheel)
+            self.viewer_x.add_geom(backwheel)
             flagx = (self.goal_position-self.min_position_x)*scale
             flagy1 = self._height(self.goal_position)*scale #jm: need to change this
             flagy2 = flagy1 + 50
             flagpole = rendering.Line((flagx, flagy1), (flagx, flagy2))
-            self.viewer.add_geom(flagpole)
+            self.viewer_x.add_geom(flagpole)
             flag = rendering.FilledPolygon([(flagx, flagy2), (flagx, flagy2-10), (flagx+25, flagy2-5)])
             flag.set_color(.8,.8,0)
-            self.viewer.add_geom(flag)
+            self.viewer_x.add_geom(flag)
 
         pos = self.state[0]
-        self.cartrans.set_translation((pos-self.min_position_x)*scale, self._height(pos)*scale) #jm: need to change this
-        self.cartrans.set_rotation(math.cos(3 * pos))
+        self.cartrans_x.set_translation((pos-self.min_position_x)*scale, self._height(pos)*scale) #jm: need to change this
+        self.cartrans_x.set_rotation(math.cos(3 * pos))
 
-        return self.viewer.render(return_rgb_array = mode=='rgb_array')
+        return self.viewer_x.render(return_rgb_array = mode=='rgb_array')
+
+
+    def render_y(self, mode='human', close=False):
+        if close:
+            if self.viewer_x is not None:
+                self.viewer_x.close()
+                self.viewer_x = None
+            if self.viewer_y is not None:
+                self.viewer_y.close()
+                self.viewer_y = None
+            return
+
+        screen_width = 600
+        screen_height = 400
+
+        world_width = self.max_position_y - self.min_position_y # same for y
+        scale = screen_width/world_width
+        carwidth=40
+        carheight=20
+
+        if self.viewer_y is None:
+            from gym.envs.classic_control import rendering
+            self.viewer_y = rendering.Viewer(screen_width, screen_height)
+            # xs = np.linspace(self.min_position_x, self.max_position_x, 100)
+            ys = np.linspace(self.min_position_y, self.max_position_y, 100)
+            # ys = np.zeros(100)
+            zs = self._height(ys)
+            xyzs = list(zip((ys-self.min_position_y)*scale, zs*scale))
+
+            self.track = rendering.make_polyline(xyzs)
+            self.track.set_linewidth(4)
+            self.viewer_y.add_geom(self.track)
+
+            clearance = 10
+
+            l,r,t,b = -carwidth/2, carwidth/2, carheight, 0
+            car = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+            car.add_attr(rendering.Transform(translation=(0, clearance)))
+            self.cartrans_y = rendering.Transform()
+            car.add_attr(self.cartrans_y)
+            self.viewer_y.add_geom(car)
+            frontwheel = rendering.make_circle(carheight/2.5)
+            frontwheel.set_color(.5, .5, .5)
+            frontwheel.add_attr(rendering.Transform(translation=(carwidth/4,clearance)))
+            frontwheel.add_attr(self.cartrans_y)
+            self.viewer_y.add_geom(frontwheel)
+            backwheel = rendering.make_circle(carheight/2.5)
+            backwheel.add_attr(rendering.Transform(translation=(-carwidth/4,clearance)))
+            backwheel.add_attr(self.cartrans_y)
+            backwheel.set_color(.5, .5, .5)
+            self.viewer_y.add_geom(backwheel)
+            flagx = (self.goal_position-self.min_position_x)*scale
+            flagy1 = self._height(self.goal_position)*scale #jm: need to change this
+            flagy2 = flagy1 + 50
+            flagpole = rendering.Line((flagx, flagy1), (flagx, flagy2))
+            self.viewer_y.add_geom(flagpole)
+            flag = rendering.FilledPolygon([(flagx, flagy2), (flagx, flagy2-10), (flagx+25, flagy2-5)])
+            flag.set_color(0,.8,.8)
+            self.viewer_y.add_geom(flag)
+
+        pos = self.state[1]
+        self.cartrans_y.set_translation((pos-self.min_position_y)*scale, self._height(pos)*scale) #jm: need to change this
+        self.cartrans_y.set_rotation(math.cos(3 * pos))
+
+        return self.viewer_y.render(return_rgb_array = mode=='rgb_array')
+
+
 
 
     def close_gui(self):

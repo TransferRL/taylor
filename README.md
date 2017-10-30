@@ -20,6 +20,9 @@
 	
 	done is defined as:
 		x and y are both greater or equal than the goal position (goal position = 0.5)
+		
+	yellow flag: shows x axis projection
+	cyan flag: shows y axis projection
 	
 ## 3D env test:
 

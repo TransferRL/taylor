@@ -100,7 +100,7 @@ class ThreeDMountainCarEnv(gym.Env):
         self.state = np.array([self.np_random.uniform(low=-0.6, high=-0.4), self.np_random.uniform(low=-0.6, high=-0.4), 0, 0])
         return np.array(self.state)
 
-    # def _height(self, xs, ys):
+    # def _height_for_car(self, xs, ys):
     #     pos = np.sqrt(np.square(xs) + np.square(ys))
     #     return np.sin(3 * pos)*.45+.55
 
@@ -170,6 +170,11 @@ class ThreeDMountainCarEnv(gym.Env):
         self.cartrans_x.set_translation((pos-self.min_position_x)*scale, self._height(pos)*scale) #jm: need to change this
         self.cartrans_x.set_rotation(math.cos(3 * pos))
 
+        # pos_x = self.state[0]
+        # pos_y = self.state[1]
+        # self.cartrans_x.set_translation((pos_x-self.min_position_x)*scale, self._height_for_car(pos_x, pos_y)*scale)
+        # self.cartrans_x.set_rotation(math.cos(3 * pos_x))
+
         return self.viewer_x.render(return_rgb_array = mode=='rgb_array')
 
 
@@ -234,6 +239,11 @@ class ThreeDMountainCarEnv(gym.Env):
         pos = self.state[1]
         self.cartrans_y.set_translation((pos-self.min_position_y)*scale, self._height(pos)*scale) #jm: need to change this
         self.cartrans_y.set_rotation(math.cos(3 * pos))
+
+        # pos_x = self.state[0]
+        # pos_y = self.state[1]
+        # self.cartrans_y.set_translation((pos_y-self.min_position_y)*scale, self._height_for_car(pos_x, pos_y)*scale)
+        # self.cartrans_y.set_rotation(math.cos(3 * pos_y))
 
         return self.viewer_y.render(return_rgb_array = mode=='rgb_array')
 

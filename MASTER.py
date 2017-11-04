@@ -8,6 +8,7 @@ import lib.QLearning as ql
 import lib.RandomAction
 import lib.env.mountain_car
 import matplotlib.pyplot as plt
+import os
 
 #### TODO: do batch norm for the neural nets
 
@@ -71,9 +72,9 @@ mc2d_env = lib.env.mountain_car.MountainCarEnv()
 mc3d_env = ThreeDMountainCarEnv()
 
 # train source task
-qlearning_2d = ql.QLearning(mc2d_env)
-qlearning_2d.learn()
-dsource = qlearning_2d.play()
+# qlearning_2d = ql.QLearning(mc2d_env)
+# qlearning_2d.learn()
+# dsource = qlearning_2d.play()
 
 # 2d random
 # random_action_2d = lib.RandomAction.RandomAction(mc2d_env)
@@ -83,9 +84,33 @@ dsource = qlearning_2d.play()
 # print(dsource)
 
 # do random action for target task
-random_action_3d = lib.RandomAction.RandomAction(mc3d_env)
-dtarget = random_action_3d.play()
+# random_action_3d = lib.RandomAction.RandomAction(mc3d_env)
+# dtarget = random_action_3d.play()
 # print(dtarget)
+
+
+# source task
+if os.path.isfile('./dsource_qlearn.npz'):
+    f_read = np.load('./dsource_qlearn.npz')
+    # print(f_read['dsource'].shape)
+    dsource = f_read['dsource']
+else:
+    qlearning_2d = ql.QLearning(mc2d_env)
+    qlearning_2d.learn()
+    dsource = np.array(qlearning_2d.play())
+    # print(dsource.shape)
+    np.savez('dsource_qlearn.npz', dsource=dsource)
+
+# target task
+if os.path.isfile('./dtarget_random.npz'):
+    f_read = np.load('./dtarget_random.npz')
+    # print(f_read['dtarget'].shape)
+    dtarget = f_read['dtarget']
+else:
+    random_action_3d = lib.RandomAction.RandomAction(mc3d_env)
+    dtarget = np.array(random_action_3d.play())
+    np.savez('./dtarget_random.npz', dtarget=dtarget)
+
 
 
 # approximate the one-step transition model

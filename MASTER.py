@@ -55,7 +55,7 @@ def neural_net(x):
 logits = neural_net(X)
 
 # Define loss and optimizer
-loss_op = tf.square(tf.reduce_mean(tf.abs(logits - Y)))
+loss_op = tf.losses.mean_squared_error(logits, Y)
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(loss_op)
 
@@ -90,16 +90,28 @@ mc3d_env = ThreeDMountainCarEnv()
 
 
 # source task
-if os.path.isfile('./dsource_qlearn.npz'):
-    f_read = np.load('./dsource_qlearn.npz')
+# if os.path.isfile('./dsource_qlearn.npz'):
+#     f_read = np.load('./dsource_qlearn.npz')
+#     # print(f_read['dsource'].shape)
+#     dsource = f_read['dsource']
+# else:
+#     qlearning_2d = ql.QLearning(mc2d_env)
+#     qlearning_2d.learn()
+#     dsource = np.array(qlearning_2d.play())
+#     # print(dsource.shape)
+#     np.savez('dsource_qlearn.npz', dsource=dsource)
+
+
+if os.path.isfile('./dsource_random.npz'):
+    f_read = np.load('./dsource_random.npz')
     # print(f_read['dsource'].shape)
     dsource = f_read['dsource']
 else:
-    qlearning_2d = ql.QLearning(mc2d_env)
-    qlearning_2d.learn()
+    qlearning_2d = lib.RandomAction.RandomAction(mc2d_env)
     dsource = np.array(qlearning_2d.play())
     # print(dsource.shape)
-    np.savez('dsource_qlearn.npz', dsource=dsource)
+    np.savez('dsource_random.npz', dsource=dsource)
+
 
 # target task
 if os.path.isfile('./dtarget_random.npz'):

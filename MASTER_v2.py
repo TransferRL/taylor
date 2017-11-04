@@ -8,6 +8,48 @@ import lib.env.mountain_car
 import os
 import lib.RandomAction
 
+learning_rate = 0.1
+num_steps = 10000
+batch_size = 100
+display_step = 100
+
+n_hidden_1 = 32 # 1st layer number of neurons
+n_hidden_2 = 32 # 2nd layer number of neurons
+num_input = 5
+num_output = 4
+
+
+def model_fn(features, labels, mode, params):
+
+    hidden_layer_1 = tf.layers.dense(features["x"], n_hidden_1)
+    hidden_layer_2 = tf.layers.dense(hidden_layer_1, n_hidden_2)
+    out_layer = tf.layers.dense(hidden_layer_2, num_output)
+
+    output = tf.reshape(out_layer, [-1])
+    if mode == tf.estimator.ModeKeys.PREDICT:
+        return tf.estimator.EstimatorSpec(
+            mode = mode,
+            predictions={"output", output}
+        )
+
+    loss = tf.losses.mean_squared_error(labels, output)
+    optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate)
+    train_op = optimizer.minimize(loss=loss, global_step=tf.train.get_global_step())
+
+    eval_metric_ops={
+        "rmse": tf.metrics.root_mean_squared_error(
+            tf.cast(labels, tf.float64), output
+        )
+    }
+
+    return tf.estimator.EstimatorSpec(
+        mode=mode,
+        loss=loss,
+        train_op=train_op,
+        eval_metric_ops=eval_metric_ops
+    )
+
+
 
 def main():
     # get envs
@@ -36,7 +78,10 @@ def main():
         np.savez('./dtarget_random.npz', dtarget = dtarget)
 
 
+    # train one step transition model
+    nn = tf.estimator.Estimator(model_fn=model_fn)
 
+    
 
 
 

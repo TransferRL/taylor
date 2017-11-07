@@ -13,11 +13,17 @@ import pprint
 if "./" not in sys.path:
     sys.path.append("./")
 
-# Load State MSE Mapping object
+# Load State MSE Mapping objects
 with open('data/mse_state_mappings.pkl', 'rb') as file:
     mse_state_mappings = pickle.load(file)
 
+with open('data/mse_action_mappings.pkl', 'rb') as file:
+    mse_action_mappings = pickle.load(file)
+
 pprint.pprint(mse_state_mappings)
+pprint.pprint(mse_action_mappings)
+print(np.shape(mse_state_mappings))
+print(np.shape(mse_action_mappings))
 
 env = ThreeDMountainCarEnv()
 
@@ -174,6 +180,17 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             # Update statistics
             stats.episode_rewards[i_episode] += reward
             stats.episode_lengths[i_episode] = t
+
+            sum = 0
+            # Use historical environment from 2d Learning env
+            for source_action in range(len(mse_action_mappings[action])):
+                sum += np.mean(mse_action_mappings[action][source_action])
+
+            for source_action in range(len(mse_action_mappings[action])):
+                # x, x_dot, y, y_dot = state
+                # mse = np.mean(mse_action_mappings[action][source_action])
+                # q_values_historic = q(x, x_dot, action)*(1/sum)*(1/mse)
+                continue
 
             # TD Update
             q_values_next = estimator.predict(next_state)

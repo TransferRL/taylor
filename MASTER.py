@@ -257,4 +257,7 @@ with tf.Session() as sess:
     with open('data/mse_state_mappings.pkl', 'wb') as file:
         pickle.dump(mse_state_mappings, file)
 
+    with open('data/mse_action_mappings.pkl', 'wb') as file:
+        pickle.dump(mse_action_mappings, file)
+
     print("Done exporting MSE file")

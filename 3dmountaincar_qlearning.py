@@ -1,15 +1,23 @@
 import itertools
 import numpy as np
 import sys
-import sklearn.preprocessing
+from sklearn.preprocessing import StandardScaler
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
 from sklearn.linear_model import SGDRegressor
 from sklearn.kernel_approximation import RBFSampler
 import sklearn.pipeline
 from lib import plotting
+import pickle
+import pprint
 
 if "./" not in sys.path:
     sys.path.append("./")
+
+# Load State MSE Mapping object
+with open('data/mse_state_mappings.pkl', 'rb') as file:
+    mse_state_mappings = pickle.load(file)
+
+pprint.pprint(mse_state_mappings)
 
 env = ThreeDMountainCarEnv()
 

@@ -4,11 +4,11 @@ import matplotlib
 import numpy as np
 import tensorflow as tf
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
-import lib.QLearning as ql
 import lib.RandomAction
 import lib.env.mountain_car
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 #### TODO: do batch norm for the neural nets
 
@@ -234,10 +234,8 @@ with tf.Session() as sess:
                     losses_act.append(mse_action_mappings[a_mc3d, a_mc2d, s])
             mse_action_mappings_result[a_mc3d, a_mc2d] = np.mean(losses_act)
 
-
     print('action mapping: {}'.format(mse_action_mappings_result))
     print('state mapping {}'.format(mse_state_mappings))
-
 
     print('x,x,x,x: {}'.format(mse_state_mappings[0][0][0][0]))
     print('x,x,x,x_dot: {}'.format(mse_state_mappings[0][0][0][1]))
@@ -256,5 +254,7 @@ with tf.Session() as sess:
     print('x_dot,x_dot,x_dot,x: {}'.format(mse_state_mappings[1][1][1][0]))
     print('x_dot,x_dot,x_dot,x_dot: {}'.format(mse_state_mappings[1][1][1][1]))
 
+    with open('data/mse_state_mappings.pkl', 'wb') as file:
+        pickle.dump(mse_state_mappings, file)
 
-
+    print("Done exporting MSE file")

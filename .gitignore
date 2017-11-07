@@ -1,1 +1,4 @@
 .idea/
+.idea/workspace.xml
+lib/__pycache__/
+*__pycache__

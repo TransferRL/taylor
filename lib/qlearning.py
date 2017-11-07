@@ -1,19 +1,17 @@
 import gym
-import itertools
 import matplotlib
 from matplotlib import pyplot as plt
+import itertools
 import numpy as np
 import sys
 import sklearn.pipeline
 import sklearn.preprocessing
 from lib import plotting
-# from gym import wrappers
+from sklearn.linear_model import SGDRegressor
+from sklearn.kernel_approximation import RBFSampler
 
 if "./" not in sys.path:
     sys.path.append("./")
-
-from sklearn.linear_model import SGDRegressor
-from sklearn.kernel_approximation import RBFSampler
 
 
 class Estimator():
@@ -98,7 +96,6 @@ class QLearning():
         self.replay_memory = None
         self.rendering = rendering
 
-
     def make_epsilon_greedy_policy(self, estimator, epsilon, nA):
         """
         Creates an epsilon-greedy policy based on a given Q-function approximator and epsilon.
@@ -122,7 +119,6 @@ class QLearning():
             return A
 
         return policy_fn
-
 
     def q_learning(self, env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, epsilon_decay=1.0):
         """
@@ -203,11 +199,8 @@ class QLearning():
 
                 state = next_state
 
-
-
     def learn(self):
         self.q_learning(self.env, self.estimator, 100, epsilon=0.3)
-
 
     def play(self):
         self.replay_memory = [] # reset

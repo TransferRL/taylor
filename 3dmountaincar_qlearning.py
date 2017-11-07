@@ -1,22 +1,15 @@
-import gym
 import itertools
-import matplotlib
-from matplotlib import pyplot as plt
 import numpy as np
 import sys
-import sklearn.pipeline
 import sklearn.preprocessing
-# from gym import wrappers
-
-if "./" not in sys.path:
-    sys.path.append("./")
-
-from lib import plotting
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
 from sklearn.linear_model import SGDRegressor
 from sklearn.kernel_approximation import RBFSampler
+import sklearn.pipeline
+from lib import plotting
 
-matplotlib.style.use('ggplot')
+if "./" not in sys.path:
+    sys.path.append("./")
 
 env = ThreeDMountainCarEnv()
 
@@ -26,7 +19,7 @@ observation_examples = np.array([env.observation_space.sample() for x in range(1
 scaler = sklearn.preprocessing.StandardScaler()
 scaler.fit(observation_examples)
 
-# Used to converte a state to a featurizes represenation.
+# Used to convert a state to a featurizes representation.
 # We use RBF kernels with different variances to cover different parts of the space
 featurizer = sklearn.pipeline.FeatureUnion([
         ("rbf1", RBFSampler(gamma=5.0, n_components=100)),
@@ -187,7 +180,7 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             # td_target = reward + discount_factor * q_values_next[next_action]
 
             # Update the function approximator using our target
-            estimator.update(state, action, td_target)
+            estimator.update(state, action, td_target) #TODO: Add historical information from 2d Env.
 
             print("\rStep {} @ Episode {}/{} ({})".format(t, i_episode + 1, num_episodes, last_reward), end="")
 
@@ -203,11 +196,6 @@ estimator = Estimator()
 
 stats = q_learning(env, estimator, 100, epsilon=0.0)
 
-# plotting.plot_cost_to_go_mountain_car(env, estimator)
-# plotting.plot_episode_stats(stats, smoothing_window=25)
-
-
-# env = wrappers.Monitor(env, './videos')
 done = 0
 policy = make_epsilon_greedy_policy(estimator, 0, env.action_space.n)
 state = env.reset()
@@ -219,17 +207,4 @@ for i_episode in range(100000):
     env.render_y()
     if done:
         print('done: {}'.format(state))
-    #     plt.figure()
-    #     plt.imshow(env.render(mode='rgb_array'))
-        # break
     state = next_state
-
-
-
-
-
-
-
-
-
-

@@ -1,22 +1,29 @@
-import gym
 import itertools
-import matplotlib
-from matplotlib import pyplot as plt
 import numpy as np
 import sys
+from sklearn.preprocessing import StandardScaler
+from lib.env.threedmountain_car import ThreeDMountainCarEnv
+from sklearn.linear_model import SGDRegressor
+from sklearn.kernel_approximation import RBFSampler
 import sklearn.pipeline
-import sklearn.preprocessing
-# from gym import wrappers
+from lib import plotting
+import pickle
+import pprint
 
 if "./" not in sys.path:
     sys.path.append("./")
 
-from lib import plotting
-from lib.env.threedmountain_car import ThreeDMountainCarEnv
-from sklearn.linear_model import SGDRegressor
-from sklearn.kernel_approximation import RBFSampler
+# Load State MSE Mapping objects
+with open('data/mse_state_mappings.pkl', 'rb') as file:
+    mse_state_mappings = pickle.load(file)
 
-matplotlib.style.use('ggplot')
+with open('data/mse_action_mappings.pkl', 'rb') as file:
+    mse_action_mappings = pickle.load(file)
+
+pprint.pprint(mse_state_mappings)
+pprint.pprint(mse_action_mappings)
+print(np.shape(mse_state_mappings))
+print(np.shape(mse_action_mappings))
 
 env = ThreeDMountainCarEnv()
 
@@ -26,7 +33,7 @@ observation_examples = np.array([env.observation_space.sample() for x in range(1
 scaler = sklearn.preprocessing.StandardScaler()
 scaler.fit(observation_examples)
 
-# Used to converte a state to a featurizes represenation.
+# Used to convert a state to a featurizes representation.
 # We use RBF kernels with different variances to cover different parts of the space
 featurizer = sklearn.pipeline.FeatureUnion([
         ("rbf1", RBFSampler(gamma=5.0, n_components=100)),
@@ -174,6 +181,17 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             stats.episode_rewards[i_episode] += reward
             stats.episode_lengths[i_episode] = t
 
+            sum = 0
+            # Use historical environment from 2d Learning env
+            for source_action in range(len(mse_action_mappings[action])):
+                sum += np.mean(mse_action_mappings[action][source_action])
+
+            for source_action in range(len(mse_action_mappings[action])):
+                # x, x_dot, y, y_dot = state
+                # mse = np.mean(mse_action_mappings[action][source_action])
+                # q_values_historic = q(x, x_dot, action)*(1/sum)*(1/mse)
+                continue
+
             # TD Update
             q_values_next = estimator.predict(next_state)
 
@@ -187,7 +205,7 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             # td_target = reward + discount_factor * q_values_next[next_action]
 
             # Update the function approximator using our target
-            estimator.update(state, action, td_target)
+            estimator.update(state, action, td_target) #TODO: Add historical information from 2d Env.
 
             print("\rStep {} @ Episode {}/{} ({})".format(t, i_episode + 1, num_episodes, last_reward), end="")
 
@@ -203,11 +221,6 @@ estimator = Estimator()
 
 stats = q_learning(env, estimator, 100, epsilon=0.0)
 
-# plotting.plot_cost_to_go_mountain_car(env, estimator)
-# plotting.plot_episode_stats(stats, smoothing_window=25)
-
-
-# env = wrappers.Monitor(env, './videos')
 done = 0
 policy = make_epsilon_greedy_policy(estimator, 0, env.action_space.n)
 state = env.reset()
@@ -219,17 +232,4 @@ for i_episode in range(100000):
     env.render_y()
     if done:
         print('done: {}'.format(state))
-    #     plt.figure()
-    #     plt.imshow(env.render(mode='rgb_array'))
-        # break
     state = next_state
-
-
-
-
-
-
-
-
-
-

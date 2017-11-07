@@ -45,11 +45,16 @@
 	
 	
 	
-	
+# Taylor's MASTER algorithm method 2 (Q-Value Re-use the mapping)
 
+## Algorithm
+    1. Get Agent's current state
+    2. Choose a(t) as the current action to evaluate (3d mountain car env)
+    3. For each source action a(s), calculate SUM += 1/MSE(at, as)
+    4. For each source action a(s):
+        1. Q(s, a(t)) += Q(x, x_dot, a(s))*1/SUM*1/MSE(at, as)
+        2. Q(s, a(t)) += Q(y, y_dot, a(s))*1/SUM*1/MSE(at, as)
+    5. Q(a, a(t)) += Q(x, y, x_dot, y_dot, a(t))
 
-
-
-
-
-	
+## Relevant Graphs to compare to non-transfer case
+    1. # of Episodes vs. Average reward

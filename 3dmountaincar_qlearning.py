@@ -20,10 +20,16 @@ with open('data/mse_state_mappings.pkl', 'rb') as file:
 with open('data/mse_action_mappings.pkl', 'rb') as file:
     mse_action_mappings = pickle.load(file)
 
+with open('data/q_learning.pkl', 'rb') as file:
+    qlearning_2d = pickle.load(file)
+
+
 pprint.pprint(mse_state_mappings)
 pprint.pprint(mse_action_mappings)
+pprint.pprint(qlearning_2d.estimator.featurize_state)
 print(np.shape(mse_state_mappings))
 print(np.shape(mse_action_mappings))
+print(np.shape(qlearning_2d.estimator.featurize_state))
 
 env = ThreeDMountainCarEnv()
 

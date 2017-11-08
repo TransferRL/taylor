@@ -8,6 +8,7 @@ import lib.RandomAction
 import lib.env.mountain_car
 import matplotlib.pyplot as plt
 import os
+import lib.qlearning as ql
 import pickle
 
 #### TODO: do batch norm for the neural nets
@@ -100,17 +101,21 @@ mc3d_env = ThreeDMountainCarEnv()
 #     dsource = np.array(qlearning_2d.play())
 #     # print(dsource.shape)
 #     np.savez('dsource_qlearn.npz', dsource=dsource)
+# if os.path.isfile('./dsource_random.npz'):
+#     f_read = np.load('./dsource_random.npz')
+#     # print(f_read['dsource'].shape)
+#     dsource = f_read['dsource']
+# else:
+#     qlearning_2d = lib.RandomAction.RandomAction(mc2d_env)
+#     dsource = np.array(qlearning_2d.play())
+#     # print(dsource.shape)
+#     np.savez('dsource_random.npz', dsource=dsource)
 
-
-if os.path.isfile('./dsource_random.npz'):
-    f_read = np.load('./dsource_random.npz')
-    # print(f_read['dsource'].shape)
-    dsource = f_read['dsource']
-else:
-    qlearning_2d = lib.RandomAction.RandomAction(mc2d_env)
-    dsource = np.array(qlearning_2d.play())
-    # print(dsource.shape)
-    np.savez('dsource_random.npz', dsource=dsource)
+qlearning_2d = ql.QLearning(mc2d_env)
+qlearning_2d.learn()
+dsource = np.array(qlearning_2d.play())
+# print(dsource.shape)
+np.savez('dsource_qlearn.npz', dsource=dsource)
 
 
 # target task
@@ -259,5 +264,8 @@ with tf.Session() as sess:
 
     with open('data/mse_action_mappings.pkl', 'wb') as file:
         pickle.dump(mse_action_mappings, file)
+
+    with open('data/q_learning.pkl', 'wb') as file:
+        pickle.dump(qlearning_2d, file)
 
     print("Done exporting MSE file")

@@ -22,14 +22,14 @@ with open('data/mse_action_mappings.pkl', 'rb') as file:
 
 with open('data/q_learning.pkl', 'rb') as file:
     qlearning_2d = pickle.load(file)
+    historic_predictor = qlearning_2d.estimator.predict
 
 
 pprint.pprint(mse_state_mappings)
 pprint.pprint(mse_action_mappings)
-pprint.pprint(qlearning_2d.estimator.featurize_state)
+pprint.pprint(historic_predictor)
 print(np.shape(mse_state_mappings))
 print(np.shape(mse_action_mappings))
-print(np.shape(qlearning_2d.estimator.featurize_state))
 
 env = ThreeDMountainCarEnv()
 
@@ -130,7 +130,7 @@ def make_epsilon_greedy_policy(estimator, epsilon, nA):
     return policy_fn
 
 
-def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, epsilon_decay=1.0):
+def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, epsilon_decay=1.0, transfer=True):
     """
     Q-Learning algorithm for fff-policy TD control using Function Approximation.
     Finds the optimal greedy policy while following an epsilon-greedy policy.
@@ -142,6 +142,7 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
         discount_factor: Lambda time discount factor.
         epsilon: Chance the sample a random action. Float betwen 0 and 1.
         epsilon_decay: Each episode, epsilon is decayed by this factor
+        transfer: Boolean to control transfer from 2d.
 
     Returns:
         An EpisodeStats object with two numpy arrays for episode_lengths and episode_rewards.
@@ -187,19 +188,24 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             stats.episode_rewards[i_episode] += reward
             stats.episode_lengths[i_episode] = t
 
-            sum = 0
-            # Use historical environment from 2d Learning env
-            for source_action in range(len(mse_action_mappings[action])):
-                sum += np.mean(mse_action_mappings[action][source_action])
-
-            for source_action in range(len(mse_action_mappings[action])):
-                # x, x_dot, y, y_dot = state
-                # mse = np.mean(mse_action_mappings[action][source_action])
-                # q_values_historic = q(x, x_dot, action)*(1/sum)*(1/mse)
-                continue
-
             # TD Update
             q_values_next = estimator.predict(next_state)
+
+            if transfer:
+                # Use historical environment from 2d Learning env
+                sum = 0
+                for source_action in range(len(mse_action_mappings[action])):
+                    sum += np.mean(mse_action_mappings[action][source_action])
+
+                q_values_historic = np.zeros(env.action_space.n)
+                for source_action in range(len(mse_action_mappings[action])):
+                    x, x_dot, y, y_dot = state
+                    mse = np.mean(mse_action_mappings[action][source_action])
+                    q_values_historic[action] += historic_predictor([x, x_dot])[source_action]*(1/sum)*(1/mse)
+                    q_values_historic[action] += historic_predictor([y, y_dot])[source_action]*(1/sum)*(1/mse)
+
+                # Historic update
+                q_values_next += q_values_historic
 
             # Use this code for Q-Learning
             # Q-Value TD Target
@@ -211,9 +217,11 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             # td_target = reward + discount_factor * q_values_next[next_action]
 
             # Update the function approximator using our target
-            estimator.update(state, action, td_target) #TODO: Add historical information from 2d Env.
+            estimator.update(state, action, td_target)
 
             print("\rStep {} @ Episode {}/{} ({})".format(t, i_episode + 1, num_episodes, last_reward), end="")
+            env.render()
+            env.render_y()
 
             if done:
                 break

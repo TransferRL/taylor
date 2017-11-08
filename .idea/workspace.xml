@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="034c2508-850e-4c88-b645-4f3625c84b8c" name="Default" comment="env test">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dsource_qlearn.npz" afterPath="$PROJECT_DIR$/dsource_qlearn.npz" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/3dmountaincar_qlearning.py" afterPath="$PROJECT_DIR$/3dmountaincar_qlearning.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MASTER.py" afterPath="$PROJECT_DIR$/MASTER.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,8 +21,8 @@
       <file leaf-file-name="3dmountaincar_qlearning.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/3dmountaincar_qlearning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1312">
-              <caret line="98" column="8" lean-forward="false" selection-start-line="98" selection-start-column="8" selection-end-line="98" selection-end-column="8" />
+            <state relative-caret-position="442">
+              <caret line="223" column="26" lean-forward="false" selection-start-line="223" selection-start-column="26" selection-end-line="223" selection-end-column="26" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -34,7 +33,7 @@
       <file leaf-file-name="MASTER.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MASTER.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
+            <state relative-caret-position="1874">
               <caret line="113" column="23" lean-forward="true" selection-start-line="113" selection-start-column="23" selection-end-line="113" selection-end-column="23" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -46,8 +45,8 @@
       <file leaf-file-name="qlearning.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/qlearning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-30">
-              <caret line="21" column="8" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+            <state relative-caret-position="-470">
+              <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -474,11 +473,11 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32978722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32845744" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22791293" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22791293" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32978722" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4175532" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41741356" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -505,7 +504,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="41" />
+      <option name="time" value="46" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -757,20 +756,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MASTER.py">
+    <entry file="file://$PROJECT_DIR$/lib/qlearning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="113" column="23" lean-forward="true" selection-start-line="113" selection-start-column="23" selection-end-line="113" selection-end-column="23" />
+        <state relative-caret-position="-470">
+          <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/qlearning.py">
+    <entry file="file://$PROJECT_DIR$/MASTER.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-30">
-          <caret line="21" column="8" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+        <state relative-caret-position="1874">
+          <caret line="113" column="23" lean-forward="true" selection-start-line="113" selection-start-column="23" selection-end-line="113" selection-end-column="23" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -779,8 +778,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/3dmountaincar_qlearning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1312">
-          <caret line="98" column="8" lean-forward="false" selection-start-line="98" selection-start-column="8" selection-end-line="98" selection-end-column="8" />
+        <state relative-caret-position="442">
+          <caret line="223" column="26" lean-forward="false" selection-start-line="223" selection-start-column="26" selection-end-line="223" selection-end-column="26" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>

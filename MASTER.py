@@ -112,7 +112,7 @@ mc3d_env = ThreeDMountainCarEnv()
 #     np.savez('dsource_random.npz', dsource=dsource)
 
 qlearning_2d = ql.QLearning(mc2d_env)
-qlearning_2d.learn()
+qlearning_2d.learn(num_episodes=500)
 dsource = np.array(qlearning_2d.play())
 # print(dsource.shape)
 np.savez('dsource_qlearn.npz', dsource=dsource)

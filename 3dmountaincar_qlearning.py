@@ -130,7 +130,8 @@ def make_epsilon_greedy_policy(estimator, epsilon, nA):
     return policy_fn
 
 
-def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, epsilon_decay=1.0, transfer=True):
+def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, epsilon_decay=1.0, transfer=True,
+               render=True):
     """
     Q-Learning algorithm for fff-policy TD control using Function Approximation.
     Finds the optimal greedy policy while following an epsilon-greedy policy.
@@ -143,6 +144,7 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
         epsilon: Chance the sample a random action. Float betwen 0 and 1.
         epsilon_decay: Each episode, epsilon is decayed by this factor
         transfer: Boolean to control transfer from 2d.
+        render: Boolean to control rendering during training
 
     Returns:
         An EpisodeStats object with two numpy arrays for episode_lengths and episode_rewards.
@@ -192,17 +194,20 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             q_values_next = estimator.predict(next_state)
 
             if transfer:
-                # Use historical environment from 2d Learning env
-                sum = 0
-                for source_action in range(len(mse_action_mappings[action])):
-                    sum += np.mean(mse_action_mappings[action][source_action])
-
                 q_values_historic = np.zeros(env.action_space.n)
-                for source_action in range(len(mse_action_mappings[action])):
-                    x, x_dot, y, y_dot = state
-                    mse = np.mean(mse_action_mappings[action][source_action])
-                    q_values_historic[action] += historic_predictor([x, x_dot])[source_action]*(1/sum)*(1/mse)
-                    q_values_historic[action] += historic_predictor([y, y_dot])[source_action]*(1/sum)*(1/mse)
+
+                # For every possible action, learn historic q-values
+                for current_action in range(env.action_space.n):
+                    # Use historical environment from 2d Learning env
+                    sum = 0
+                    for source_action in range(len(mse_action_mappings[current_action])):
+                        sum += np.mean(mse_action_mappings[current_action][source_action])
+
+                    for source_action in range(len(mse_action_mappings[current_action])):
+                        x, x_dot, y, y_dot = state
+                        mse = np.mean(mse_action_mappings[current_action][source_action])
+                        q_values_historic[current_action] += historic_predictor([x, x_dot])[source_action]*(1/sum)*(1/mse)
+                        q_values_historic[current_action] += historic_predictor([y, y_dot])[source_action]*(1/sum)*(1/mse)
 
                 # Historic update
                 q_values_next += q_values_historic
@@ -220,8 +225,10 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
             estimator.update(state, action, td_target)
 
             print("\rStep {} @ Episode {}/{} ({})".format(t, i_episode + 1, num_episodes, last_reward), end="")
-            env.render()
-            env.render_y()
+
+            if render:
+                env.render()
+                env.render_y()
 
             if done:
                 break
@@ -233,17 +240,10 @@ def q_learning(env, estimator, num_episodes, discount_factor=1.0, epsilon=0.5, e
 
 estimator = Estimator()
 
-stats = q_learning(env, estimator, 100, epsilon=0.0)
+stats = q_learning(env, estimator, 100, epsilon=0.0, transfer=False, render=False)
+print(stats.episode_rewards)
 
-done = 0
-policy = make_epsilon_greedy_policy(estimator, 0, env.action_space.n)
-state = env.reset()
-for i_episode in range(100000):
-    action_probs = policy(state)
-    action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
-    next_state, reward, done, info = env.step(action)
-    env.render()
-    env.render_y()
-    if done:
-        print('done: {}'.format(state))
-    state = next_state
+stats2 = q_learning(env, estimator, 100, epsilon=0.0, transfer=True, render=False)
+print(stats2.episode_rewards)
+
+plotting.plot_two_episode_stats([stats, stats2], smoothing_window=25)

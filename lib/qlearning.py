@@ -199,8 +199,8 @@ class QLearning():
 
                 state = next_state
 
-    def learn(self):
-        self.q_learning(self.env, self.estimator, 100, epsilon=0.3)
+    def learn(self, num_episodes=100):
+        self.q_learning(self.env, self.estimator, num_episodes, epsilon=0.3)
 
     def play(self):
         self.replay_memory = [] # reset

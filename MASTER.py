@@ -91,16 +91,21 @@ mc3d_env = ThreeDMountainCarEnv()
 
 
 # source task
-# if os.path.isfile('./dsource_qlearn.npz'):
-#     f_read = np.load('./dsource_qlearn.npz')
-#     # print(f_read['dsource'].shape)
-#     dsource = f_read['dsource']
-# else:
-#     qlearning_2d = ql.QLearning(mc2d_env)
-#     qlearning_2d.learn()
-#     dsource = np.array(qlearning_2d.play())
-#     # print(dsource.shape)
-#     np.savez('dsource_qlearn.npz', dsource=dsource)
+if os.path.isfile('./dsource_qlearn.npz'):
+    f_read = np.load('./dsource_qlearn.npz')
+    # print(f_read['dsource'].shape)
+    dsource = f_read['dsource']
+
+else:
+    qlearning_2d = ql.QLearning(mc2d_env)
+    qlearning_2d.learn()
+    dsource = np.array(qlearning_2d.play())
+    # print(dsource.shape)
+    np.savez('dsource_qlearn.npz', dsource=dsource)
+
+    with open('./data/q_learning.pkl', 'wb') as file:
+        pickle.dump(qlearning_2d, file)
+
 # if os.path.isfile('./dsource_random.npz'):
 #     f_read = np.load('./dsource_random.npz')
 #     # print(f_read['dsource'].shape)
@@ -111,11 +116,6 @@ mc3d_env = ThreeDMountainCarEnv()
 #     # print(dsource.shape)
 #     np.savez('dsource_random.npz', dsource=dsource)
 
-qlearning_2d = ql.QLearning(mc2d_env)
-qlearning_2d.learn(num_episodes=500)
-dsource = np.array(qlearning_2d.play())
-# print(dsource.shape)
-np.savez('dsource_qlearn.npz', dsource=dsource)
 
 
 # target task
@@ -259,13 +259,11 @@ with tf.Session() as sess:
     print('x_dot,x_dot,x_dot,x: {}'.format(mse_state_mappings[1][1][1][0]))
     print('x_dot,x_dot,x_dot,x_dot: {}'.format(mse_state_mappings[1][1][1][1]))
 
-    with open('data/mse_state_mappings.pkl', 'wb') as file:
+    with open('./data/mse_state_mappings.pkl', 'wb') as file:
         pickle.dump(mse_state_mappings, file)
 
-    with open('data/mse_action_mappings.pkl', 'wb') as file:
+    with open('./data/mse_action_mappings.pkl', 'wb') as file:
         pickle.dump(mse_action_mappings, file)
 
-    with open('data/q_learning.pkl', 'wb') as file:
-        pickle.dump(qlearning_2d, file)
 
     print("Done exporting MSE file")

@@ -41,6 +41,7 @@ class ThreeDMountainCarEnv(gym.Env):
 
         self.viewer_x = None
         self.viewer_y = None
+        self.viewer_orthographic = None
 
         self.action_space = spaces.Discrete(5) # jm: {Neutral, West, East, South, North}
         self.observation_space = spaces.Box(self.low, self.high)
@@ -51,9 +52,6 @@ class ThreeDMountainCarEnv(gym.Env):
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
-
-    def set_state(self, state):
-        self.state = state;
 
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
@@ -119,6 +117,9 @@ class ThreeDMountainCarEnv(gym.Env):
             if self.viewer_y is not None:
                 self.viewer_y.close()
                 self.viewer_y = None
+            if self.viewer_orthographic is not None:
+                self.viewer_orthographic.close()
+                self.viewer_orthographic = None
             return
 
         screen_width = 600
@@ -189,6 +190,9 @@ class ThreeDMountainCarEnv(gym.Env):
             if self.viewer_y is not None:
                 self.viewer_y.close()
                 self.viewer_y = None
+            if self.viewer_orthographic is not None:
+                self.viewer_orthographic.close()
+                self.viewer_orthographic = None
             return
 
         screen_width = 600
@@ -250,7 +254,111 @@ class ThreeDMountainCarEnv(gym.Env):
 
         return self.viewer_y.render(return_rgb_array = mode=='rgb_array')
 
+    def render_orthographic(self, mode='human', close=False):
 
+        if close:
+            if self.viewer_x is not None:
+                self.viewer_x.close()
+                self.viewer_x = None
+            if self.viewer_y is not None:
+                self.viewer_y.close()
+                self.viewer_y = None
+            if self.viewer_orthographic is not None:
+                self.viewer_orthographic.close()
+                self.viewer_orthographic = None
+            return
+
+        screen_width = 600
+        screen_height = 600
+
+        world_height = self.max_position_y - self.min_position_y # same for y
+        scale = (screen_height-100)/world_height
+        carwidth=20
+        carheight=10
+
+        if self.viewer_orthographic is None:
+            from gym.envs.classic_control import rendering
+            self.viewer_orthographic = rendering.Viewer(screen_width, screen_height)
+
+            # ys = np.linspace(self.min_position_y, self.max_position_y, 100)
+
+            # zs = self._height(ys)
+            # xyzs = list(zip((ys-self.min_position_y)*scale, zs*scale))
+
+            # self.track = rendering.make_polyline(xyzs)
+            # self.track.set_linewidth(4)
+            # self.viewer_orthographic.add_geom(self.track)
+
+            min_x = -math.pi/6
+            min_y = -math.pi/6
+
+            origin_res = 50
+            origin_radius = 2
+
+            origin_circle = rendering.make_circle(radius=origin_radius, res= origin_res, filled = True)
+            origin_circle.set_color(0,0,0)
+            origin_circle.add_attr(rendering.Transform(translation=((min_x - self.min_position_x) * scale,(min_y - self.min_position_y) * scale)))
+            self.viewer_orthographic.add_geom(origin_circle)
+
+
+            radius_unscaled = math.sqrt((self.goal_position-min_x)**2 + (self.goal_position-min_y)**2)
+            equilline_radius = radius_unscaled * scale
+            #
+            # points_x = []
+            # points_y = []
+            # offset_x, offset_y = (min_x - self.min_position_x) * scale, (min_y - self.min_position_y)*scale
+            # for i in range(res):
+            #     ang = 2 * math.pi * i / res
+            #     points_x.append(offset_x + math.cos(ang) * radius)
+            #     points_y.append(offset_y + math.sin(ang) * radius)
+            #
+            # equiline = list(zip(points_x, points_y))
+            # self.track = rendering.make_polyline(equiline)
+            # self.track.set_linewidth(4)
+            equiline = rendering.make_circle(radius=equilline_radius, res= 200, filled = False)
+            equiline.set_color(0,0,0)
+            equiline.add_attr(rendering.Transform(translation=((min_x - self.min_position_x) * scale,(min_y - self.min_position_y) * scale)))
+            equiline.add_attr(rendering.LineWidth(10)) # not sure why doesn't work
+            self.viewer_orthographic.add_geom(equiline)
+
+            clearance = 5
+            clearance_wheels = 0
+
+            l, r, t, b = -carwidth / 2, carwidth / 2, carheight/2, -carheight/2
+            car = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
+            car.add_attr(rendering.Transform(translation=(0, clearance)))
+            self.cartrans_orth = rendering.Transform()
+            car.add_attr(self.cartrans_orth)
+            self.viewer_orthographic.add_geom(car)
+
+            frontwheel = rendering.make_circle(carheight/2.5)
+            frontwheel.set_color(.5, .5, .5)
+            frontwheel.add_attr(rendering.Transform(translation=(carwidth/4,clearance_wheels)))
+            frontwheel.add_attr(self.cartrans_orth)
+            self.viewer_orthographic.add_geom(frontwheel)
+            backwheel = rendering.make_circle(carheight/2.5)
+            backwheel.add_attr(rendering.Transform(translation=(-carwidth/4,clearance_wheels)))
+            backwheel.add_attr(self.cartrans_orth)
+            backwheel.set_color(.5, .5, .5)
+            self.viewer_orthographic.add_geom(backwheel)
+
+
+            flagx = (self.goal_position-self.min_position_x)*scale
+            flagy1 = (self.goal_position-self.min_position_y)*scale
+            flagy2 = flagy1 + 50
+            flagpole = rendering.Line((flagx, flagy1), (flagx, flagy2))
+            self.viewer_orthographic.add_geom(flagpole)
+            flag = rendering.FilledPolygon([(flagx, flagy2), (flagx, flagy2-10), (flagx+25, flagy2-5)])
+            flag.set_color(1,0,0)
+            self.viewer_orthographic.add_geom(flag)
+
+        pos_x = self.state[0]
+        pos_y = self.state[1]
+        self.cartrans_orth.set_translation((pos_x-self.min_position_x)*scale, (pos_y-self.min_position_y)*scale)
+        # self.cartrans_orth.set_rotation(math.cos(3 * pos))
+
+
+        return self.viewer_orthographic.render(return_rgb_array = mode=='rgb_array')
 
 
     def close_gui(self):

@@ -292,41 +292,37 @@ class ThreeDMountainCarEnv(gym.Env):
             min_x = -math.pi/6
             min_y = -math.pi/6
 
-            points_origin_x = []
-            points_origin_y = []
-
             origin_res = 50
             origin_radius = 2
-            for i in range(origin_res):
-                ang = 2 * math.pi * i / origin_res
-                points_origin_x.append((min_x - self.min_position_x) * scale + math.cos(ang) * origin_radius)
-                points_origin_y.append((min_y - self.min_position_y) * scale + math.sin(ang) * origin_radius)
 
-            origin_points = list(zip(points_origin_x, points_origin_y))
-            self.origin = rendering.make_polyline(origin_points)
-            self.origin.set_linewidth(2)
-            self.viewer_orthographic.add_geom(self.origin)
+            origin_circle = rendering.make_circle(radius=origin_radius, res= origin_res, filled = True)
+            origin_circle.set_color(0,0,0)
+            origin_circle.add_attr(rendering.Transform(translation=((min_x - self.min_position_x) * scale,(min_y - self.min_position_y) * scale)))
+            self.viewer_orthographic.add_geom(origin_circle)
 
 
             radius_unscaled = math.sqrt((self.goal_position-min_x)**2 + (self.goal_position-min_y)**2)
+            equilline_radius = radius_unscaled * scale
+            #
+            # points_x = []
+            # points_y = []
+            # offset_x, offset_y = (min_x - self.min_position_x) * scale, (min_y - self.min_position_y)*scale
+            # for i in range(res):
+            #     ang = 2 * math.pi * i / res
+            #     points_x.append(offset_x + math.cos(ang) * radius)
+            #     points_y.append(offset_y + math.sin(ang) * radius)
+            #
+            # equiline = list(zip(points_x, points_y))
+            # self.track = rendering.make_polyline(equiline)
+            # self.track.set_linewidth(4)
+            equiline = rendering.make_circle(radius=equilline_radius, res= 200, filled = False)
+            equiline.set_color(0,0,0)
+            equiline.add_attr(rendering.Transform(translation=((min_x - self.min_position_x) * scale,(min_y - self.min_position_y) * scale)))
+            equiline.add_attr(rendering.LineWidth(10)) # not sure why doesn't work
+            self.viewer_orthographic.add_geom(equiline)
 
-            points_x = []
-            points_y = []
-            res = 1000
-            radius = radius_unscaled*scale
-            offset_x, offset_y = (min_x - self.min_position_x) * scale, (min_y - self.min_position_y)*scale
-            for i in range(res):
-                ang = 2 * math.pi * i / res
-                points_x.append(offset_x + math.cos(ang) * radius)
-                points_y.append(offset_y + math.sin(ang) * radius)
-
-            equiline = list(zip(points_x, points_y))
-            self.track = rendering.make_polyline(equiline)
-            self.track.set_linewidth(4)
-            self.viewer_orthographic.add_geom(self.track)
-
-            clearance = 10
-            clearance_wheels = 5
+            clearance = 5
+            clearance_wheels = 0
 
             l, r, t, b = -carwidth / 2, carwidth / 2, carheight/2, -carheight/2
             car = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])

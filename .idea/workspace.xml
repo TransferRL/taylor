@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="034c2508-850e-4c88-b645-4f3625c84b8c" name="Default" comment="env test">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/2d_instances.pkl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/3d_instances.pkl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/generate_instances.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/env/threedmountain_car.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/state_sampler_tests.py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/lib/state_sampler.py" afterPath="$PROJECT_DIR$/lib/instance_sampler.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/env/mountain_car.py" afterPath="$PROJECT_DIR$/lib/env/mountain_car.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/3d_mountaincar_env_test.py" afterPath="$PROJECT_DIR$/3d_mountaincar_env_test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/env/threedmountain_car.py" afterPath="$PROJECT_DIR$/lib/env/threedmountain_car.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,8 +20,18 @@
       <file leaf-file-name="3dmountaincar_qlearning.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/3dmountaincar_qlearning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="234" column="0" lean-forward="true" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
+            <state relative-caret-position="308">
+              <caret line="233" column="21" lean-forward="true" selection-start-line="233" selection-start-column="21" selection-end-line="233" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="threedmountain_car.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/env/threedmountain_car.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="344">
+              <caret line="311" column="0" lean-forward="true" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -36,8 +40,8 @@
       <file leaf-file-name="rendering.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../reinforcement-learning/gym/gym/envs/classic_control/rendering.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2340">
-              <caret line="229" column="4" lean-forward="false" selection-start-line="229" selection-start-column="4" selection-end-line="229" selection-end-column="4" />
+            <state relative-caret-position="224">
+              <caret line="182" column="19" lean-forward="true" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -46,12 +50,9 @@
       <file leaf-file-name="3d_mountaincar_env_test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/3d_mountaincar_env_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="14" column="24" lean-forward="false" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
-              <folding>
-                <marker date="1510505707292" expanded="true" signature="223:392" ph="..." />
-                <marker date="1510505707292" expanded="true" signature="395:439" ph="..." />
-              </folding>
+            <state relative-caret-position="252">
+              <caret line="18" column="13" lean-forward="true" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -94,8 +95,6 @@
         <option value="$PROJECT_DIR$/lib/env/mountain_car.py" />
         <option value="$PROJECT_DIR$/QLearning_unit_test.py" />
         <option value="$PROJECT_DIR$/lib/QLearning.py" />
-        <option value="$PROJECT_DIR$/3d_mountaincar_env_test.py" />
-        <option value="$PROJECT_DIR$/lib/env/threedmountain_car.py" />
         <option value="$PROJECT_DIR$/MASTER_v2.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/videos/3d_mountaincar_TL.py" />
@@ -103,10 +102,12 @@
         <option value="$PROJECT_DIR$/lib/plotting.py" />
         <option value="$PROJECT_DIR$/3dmountaincar_qlearning.py" />
         <option value="$PROJECT_DIR$/MASTER.py" />
+        <option value="$PROJECT_DIR$/lib/env/threedmountain_car.py" />
+        <option value="$PROJECT_DIR$/3d_mountaincar_env_test.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1358" />
     <option name="width" value="1390" />
     <option name="height" value="1756" />
@@ -176,7 +177,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.3dmountaincar_qlearning">
+  <component name="RunManager" selected="Python.3d_mountaincar_env_test">
     <configuration name="3d_mountaincar_env_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -405,9 +406,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.3dmountaincar_qlearning" />
-        <item index="1" class="java.lang.String" itemvalue="Python.MASTER" />
-        <item index="2" class="java.lang.String" itemvalue="Python.3d_mountaincar_env_test" />
+        <item index="0" class="java.lang.String" itemvalue="Python.3d_mountaincar_env_test" />
+        <item index="1" class="java.lang.String" itemvalue="Python.3dmountaincar_qlearning" />
+        <item index="2" class="java.lang.String" itemvalue="Python.MASTER" />
         <item index="3" class="java.lang.String" itemvalue="Python.MASTER_v2" />
         <item index="4" class="java.lang.String" itemvalue="Python.QLearning_unit_test" />
       </list>
@@ -435,14 +436,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1381" height="885" extended-state="7" />
+    <frame x="-6" y="-6" width="1381" height="885" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23960695" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32978722" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25797874" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25797874" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32978722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32845744" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -662,14 +663,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../reinforcement-learning/gym/gym/envs/classic_control/rendering.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2340">
-          <caret line="229" column="4" lean-forward="false" selection-start-line="229" selection-start-column="4" selection-end-line="229" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../reinforcement-learning/labs/lab3/lab3/simpledqn/main.py" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
@@ -680,17 +673,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore" />
     <entry file="file://$PROJECT_DIR$/videos/3d_mountaincar_TL.py" />
-    <entry file="file://$PROJECT_DIR$/3d_mountaincar_env_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="14" column="24" lean-forward="false" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
-          <folding>
-            <marker date="1510505707292" expanded="true" signature="223:392" ph="..." />
-            <marker date="1510505707292" expanded="true" signature="395:439" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/state_sampler.py" />
     <entry file="file://$PROJECT_DIR$/lib/plotting.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -735,18 +717,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../reinforcement-learning/gym/gym/envs/classic_control/rendering.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="182" column="19" lean-forward="true" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/3d_mountaincar_env_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="18" column="13" lean-forward="true" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/env/threedmountain_car.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="924">
-          <caret line="221" column="73" lean-forward="false" selection-start-line="221" selection-start-column="73" selection-end-line="221" selection-end-column="73" />
+        <state relative-caret-position="344">
+          <caret line="311" column="0" lean-forward="true" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/3dmountaincar_qlearning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="234" column="0" lean-forward="true" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
+        <state relative-caret-position="308">
+          <caret line="233" column="21" lean-forward="true" selection-start-line="233" selection-start-column="21" selection-end-line="233" selection-end-column="21" />
           <folding />
         </state>
       </provider>

@@ -289,13 +289,46 @@ class ThreeDMountainCarEnv(gym.Env):
             # self.track.set_linewidth(4)
             # self.viewer_orthographic.add_geom(self.track)
 
-            self.track = rendering.make_circle(radius=1.4467*scale, filled=False)
+            min_x = -math.pi/6
+            min_y = -math.pi/6
+
+            points_origin_x = []
+            points_origin_y = []
+
+            origin_res = 50
+            origin_radius = 2
+            for i in range(origin_res):
+                ang = 2 * math.pi * i / origin_res
+                points_origin_x.append((min_x - self.min_position_x) * scale + math.cos(ang) * origin_radius)
+                points_origin_y.append((min_y - self.min_position_y) * scale + math.sin(ang) * origin_radius)
+
+            origin_points = list(zip(points_origin_x, points_origin_y))
+            self.origin = rendering.make_polyline(origin_points)
+            self.origin.set_linewidth(2)
+            self.viewer_orthographic.add_geom(self.origin)
+
+
+            radius_unscaled = math.sqrt((self.goal_position-min_x)**2 + (self.goal_position-min_y)**2)
+
+            points_x = []
+            points_y = []
+            res = 1000
+            radius = radius_unscaled*scale
+            offset_x, offset_y = (min_x - self.min_position_x) * scale, (min_y - self.min_position_y)*scale
+            for i in range(res):
+                ang = 2 * math.pi * i / res
+                points_x.append(offset_x + math.cos(ang) * radius)
+                points_y.append(offset_y + math.sin(ang) * radius)
+
+            equiline = list(zip(points_x, points_y))
+            self.track = rendering.make_polyline(equiline)
             self.track.set_linewidth(4)
             self.viewer_orthographic.add_geom(self.track)
 
             clearance = 10
+            clearance_wheels = 5
 
-            l, r, t, b = -carwidth / 2, carwidth / 2, carheight, 0
+            l, r, t, b = -carwidth / 2, carwidth / 2, carheight/2, -carheight/2
             car = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
             car.add_attr(rendering.Transform(translation=(0, clearance)))
             self.cartrans_orth = rendering.Transform()
@@ -304,11 +337,11 @@ class ThreeDMountainCarEnv(gym.Env):
 
             frontwheel = rendering.make_circle(carheight/2.5)
             frontwheel.set_color(.5, .5, .5)
-            frontwheel.add_attr(rendering.Transform(translation=(carwidth/4,clearance)))
+            frontwheel.add_attr(rendering.Transform(translation=(carwidth/4,clearance_wheels)))
             frontwheel.add_attr(self.cartrans_orth)
             self.viewer_orthographic.add_geom(frontwheel)
             backwheel = rendering.make_circle(carheight/2.5)
-            backwheel.add_attr(rendering.Transform(translation=(-carwidth/4,clearance)))
+            backwheel.add_attr(rendering.Transform(translation=(-carwidth/4,clearance_wheels)))
             backwheel.add_attr(self.cartrans_orth)
             backwheel.set_color(.5, .5, .5)
             self.viewer_orthographic.add_geom(backwheel)
@@ -325,7 +358,7 @@ class ThreeDMountainCarEnv(gym.Env):
 
         pos_x = self.state[0]
         pos_y = self.state[1]
-        self.cartrans_orth.set_translation((pos_x-self.min_position_x)*scale, (pos_x-self.min_position_x)*scale)
+        self.cartrans_orth.set_translation((pos_x-self.min_position_x)*scale, (pos_y-self.min_position_y)*scale)
         # self.cartrans_orth.set_rotation(math.cos(3 * pos))
 
 

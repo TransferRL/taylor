@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
-import lib.QLearning as ql
+import lib.qlearning as ql
 import lib.env.mountain_car
 import os
 import lib.RandomAction

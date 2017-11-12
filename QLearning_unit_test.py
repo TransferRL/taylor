@@ -1,5 +1,5 @@
 import unittest
-import lib.QLearning as ql
+import lib.qlearning as ql
 import gym
 import lib.env.mountain_car
 

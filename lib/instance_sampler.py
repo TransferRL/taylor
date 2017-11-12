@@ -19,7 +19,7 @@ class InstanceSampler():
 
         state = [random_pos, random_velocity]
         env.set_state(state);
-        action = np.random.randint(low=0, high=2)
+        action = np.random.randint(low=0, high=3)
         next_state, reward, done, info = env.step(action)
         return [state, action, next_state, reward, done]
 
@@ -37,6 +37,6 @@ class InstanceSampler():
 
         state = [random_pos_x, random_pos_y, random_velocity_x, random_velocity_y]
         env.set_state(state);
-        action = np.random.randint(low=0, high=4)
+        action = np.random.randint(low=0, high=5)
         next_state, reward, done, info= env.step(action)
         return [state, action, next_state, reward, done]

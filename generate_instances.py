@@ -38,7 +38,9 @@ if __name__ == "__main__":
     # [state, action, next_state, reward, done]
     with open('./data/2d_instances.pkl', "rb") as f:
         instances = cPickcle.load(f)
-        print(instances[:5])
+        count_terminations = [1 for ele in instances if ele[4]]
+        print(len(count_terminations))
     with open('./data/3d_instances.pkl', "rb") as f:
         instances = cPickcle.load(f)
-        print(instances[:5])
+        count_terminations = [1 for ele in instances if ele[4]]
+        print(len(count_terminations))

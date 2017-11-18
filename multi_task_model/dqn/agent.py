@@ -5,8 +5,10 @@ import random
 import numpy as np
 from tqdm import tqdm
 import tensorflow as tf
+from functools import reduce
 
 from .base import BaseModel
+from .environment import MultiTaskEnv
 from .history import History
 from .replay_memory import ReplayMemory
 from .ops import linear, conv2d, clipped_error
@@ -18,7 +20,7 @@ class Agent(BaseModel):
     self.sess = sess
     self.weight_dir = 'weights'
 
-    self.env = environment
+    self.env = MultiTaskEnv(environment, config)
     self.history = History(self.config)
     self.memory = ReplayMemory(self.config, self.model_dir)
 
@@ -38,10 +40,10 @@ class Agent(BaseModel):
     max_avg_ep_reward = 0
     ep_rewards, actions = [], []
 
-    screen, reward, action, terminal = self.env.new_random_game()
+    state, reward, action, terminal = self.env.random_new_game()
 
     for _ in range(self.history_length):
-      self.history.add(screen)
+      self.history.add(state)
 
     for self.step in tqdm(range(start_step, self.max_step), ncols=70, initial=start_step):
       if self.step == self.learn_start:
@@ -52,12 +54,12 @@ class Agent(BaseModel):
       # 1. predict
       action = self.predict(self.history.get())
       # 2. act
-      screen, reward, terminal = self.env.act(action, is_training=True)
+      state, reward, terminal = self.env.act(action)
       # 3. observe
-      self.observe(screen, reward, action, terminal)
+      self.observe(state, reward, action, terminal)
 
       if terminal:
-        screen, reward, action, terminal = self.env.new_random_game()
+        state, reward, action, terminal = self.env.random_new_game()
 
         num_game += 1
         ep_rewards.append(ep_reward)
@@ -113,7 +115,7 @@ class Agent(BaseModel):
           ep_rewards = []
           actions = []
 
-  def predict(self, s_t, test_ep=None):
+  def predict(self, s_t, test_ep=0.5):
     ep = test_ep or (self.ep_end +
         max(0., (self.ep_start - self.ep_end)
           * (self.ep_end_t - max(0., self.step - self.learn_start)) / self.ep_end_t))
@@ -125,11 +127,11 @@ class Agent(BaseModel):
 
     return action
 
-  def observe(self, screen, reward, action, terminal):
+  def observe(self, state, reward, action, terminal):
     reward = max(self.min_reward, min(self.max_reward, reward))
 
-    self.history.add(screen)
-    self.memory.add(screen, reward, action, terminal)
+    self.history.add(state)
+    self.memory.add(state, reward, action, terminal)
 
     if self.step > self.learn_start:
       if self.step % self.train_frequency == 0:
@@ -174,100 +176,74 @@ class Agent(BaseModel):
     self.update_count += 1
 
   def build_dqn(self):
+
+    num_input, n_hidden_1, n_hidden_2, num_output = \
+      self.config.num_input, self.config.n_hidden_1, self.config.n_hidden_2, self.config.num_output
+
+    # # Store layers weight & bias
+    # self.w = {
+    #   'h1_w': tf.Variable(tf.random_normal([num_input, n_hidden_1])),
+    #   'h2_w': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+    #   'out_w': tf.Variable(tf.random_normal([n_hidden_2, num_output])),
+    #   'h1_b': tf.Variable(tf.random_normal([n_hidden_1])),
+    #   'h2_b': tf.Variable(tf.random_normal([n_hidden_2])),
+    #   'out_b': tf.Variable(tf.random_normal([num_output]))
+    # }
+    #
+    # self.t_w = {
+    #   'h1_w': tf.Variable(tf.random_normal([num_input, n_hidden_1])),
+    #   'h2_w': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+    #   'out_w': tf.Variable(tf.random_normal([n_hidden_2, num_output])),
+    #   'h1_b': tf.Variable(tf.random_normal([n_hidden_1])),
+    #   'h2_b': tf.Variable(tf.random_normal([n_hidden_2])),
+    #   'out_b': tf.Variable(tf.random_normal([num_output]))
+    # }
+
     self.w = {}
     self.t_w = {}
 
     #initializer = tf.contrib.layers.xavier_initializer()
     initializer = tf.truncated_normal_initializer(0, 0.02)
-    activation_fn = tf.nn.relu
+    # activation_fn = tf.nn.relu
 
     # training network
     with tf.variable_scope('prediction'):
-      if self.cnn_format == 'NHWC':
-        self.s_t = tf.placeholder('float32',
-            [None, self.screen_height, self.screen_width, self.history_length], name='s_t')
-      else:
-        self.s_t = tf.placeholder('float32',
-            [None, self.history_length, self.screen_height, self.screen_width], name='s_t')
+      self.s_t = tf.placeholder('float32',
+                                [None, self.state_height, self.state_width, self.history_length], name='s_t')
+      # self.s_t = tf.placeholder('float32', [self.state_height, self.state_width], name='s_t')
 
-      self.l1, self.w['l1_w'], self.w['l1_b'] = conv2d(self.s_t,
-          32, [8, 8], [4, 4], initializer, activation_fn, self.cnn_format, name='l1')
-      self.l2, self.w['l2_w'], self.w['l2_b'] = conv2d(self.l1,
-          64, [4, 4], [2, 2], initializer, activation_fn, self.cnn_format, name='l2')
-      self.l3, self.w['l3_w'], self.w['l3_b'] = conv2d(self.l2,
-          64, [3, 3], [1, 1], initializer, activation_fn, self.cnn_format, name='l3')
+      shape = self.s_t.get_shape().as_list()
+      self.s_t_flat = tf.reshape(self.s_t, [-1, reduce(lambda x, y: x * y, shape[1:])])
+      self.l1, self.w['h1_w'], self.w['h1_b'] = \
+          linear(self.s_t_flat, n_hidden_1, name='hidden-1')
 
-      shape = self.l3.get_shape().as_list()
-      self.l3_flat = tf.reshape(self.l3, [-1, reduce(lambda x, y: x * y, shape[1:])])
-
-      if self.dueling:
-        self.value_hid, self.w['l4_val_w'], self.w['l4_val_b'] = \
-            linear(self.l3_flat, 512, activation_fn=activation_fn, name='value_hid')
-
-        self.adv_hid, self.w['l4_adv_w'], self.w['l4_adv_b'] = \
-            linear(self.l3_flat, 512, activation_fn=activation_fn, name='adv_hid')
-
-        self.value, self.w['val_w_out'], self.w['val_w_b'] = \
-          linear(self.value_hid, 1, name='value_out')
-
-        self.advantage, self.w['adv_w_out'], self.w['adv_w_b'] = \
-          linear(self.adv_hid, self.env.action_size, name='adv_out')
-
-        # Average Dueling
-        self.q = self.value + (self.advantage - 
-          tf.reduce_mean(self.advantage, reduction_indices=1, keep_dims=True))
-      else:
-        self.l4, self.w['l4_w'], self.w['l4_b'] = linear(self.l3_flat, 512, activation_fn=activation_fn, name='l4')
-        self.q, self.w['q_w'], self.w['q_b'] = linear(self.l4, self.env.action_size, name='q')
+      self.l2, self.w['h2_w'], self.w['h2_b'] = \
+          linear(self.l1, n_hidden_2, name='hidden-2')
+      self.q, self.w['out_w'], self.w['out_b'] = \
+          linear(self.l1, num_output, name='output')
 
       self.q_action = tf.argmax(self.q, dimension=1)
 
       q_summary = []
       avg_q = tf.reduce_mean(self.q, 0)
-      for idx in xrange(self.env.action_size):
+      for idx in range(self.env.action_size):
         q_summary.append(tf.summary.histogram('q/%s' % idx, avg_q[idx]))
       self.q_summary = tf.summary.merge(q_summary, 'q_summary')
 
     # target network
     with tf.variable_scope('target'):
-      if self.cnn_format == 'NHWC':
-        self.target_s_t = tf.placeholder('float32', 
-            [None, self.screen_height, self.screen_width, self.history_length], name='target_s_t')
-      else:
-        self.target_s_t = tf.placeholder('float32', 
-            [None, self.history_length, self.screen_height, self.screen_width], name='target_s_t')
+      self.target_s_t = tf.placeholder('float32',
+                                       [None, self.state_height, self.state_width, self.history_length], name='s_t')
+      # self.target_s_t = tf.placeholder('float32', [self.state_height, self.state_width], name='s_t')
+      shape = self.s_t.get_shape().as_list()
+      self.target_s_t_flat = tf.reshape(self.target_s_t, [-1, reduce(lambda x, y: x * y, shape[1:])])
+      self.target_l1, self.t_w['h1_w'], self.t_w['h1_b'] = \
+          linear(self.target_s_t_flat, n_hidden_1, name='target-hidden-1')
 
-      self.target_l1, self.t_w['l1_w'], self.t_w['l1_b'] = conv2d(self.target_s_t, 
-          32, [8, 8], [4, 4], initializer, activation_fn, self.cnn_format, name='target_l1')
-      self.target_l2, self.t_w['l2_w'], self.t_w['l2_b'] = conv2d(self.target_l1,
-          64, [4, 4], [2, 2], initializer, activation_fn, self.cnn_format, name='target_l2')
-      self.target_l3, self.t_w['l3_w'], self.t_w['l3_b'] = conv2d(self.target_l2,
-          64, [3, 3], [1, 1], initializer, activation_fn, self.cnn_format, name='target_l3')
-
-      shape = self.target_l3.get_shape().as_list()
-      self.target_l3_flat = tf.reshape(self.target_l3, [-1, reduce(lambda x, y: x * y, shape[1:])])
-
-      if self.dueling:
-        self.t_value_hid, self.t_w['l4_val_w'], self.t_w['l4_val_b'] = \
-            linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_value_hid')
-
-        self.t_adv_hid, self.t_w['l4_adv_w'], self.t_w['l4_adv_b'] = \
-            linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_adv_hid')
-
-        self.t_value, self.t_w['val_w_out'], self.t_w['val_w_b'] = \
-          linear(self.t_value_hid, 1, name='target_value_out')
-
-        self.t_advantage, self.t_w['adv_w_out'], self.t_w['adv_w_b'] = \
-          linear(self.t_adv_hid, self.env.action_size, name='target_adv_out')
-
-        # Average Dueling
-        self.target_q = self.t_value + (self.t_advantage - 
-          tf.reduce_mean(self.t_advantage, reduction_indices=1, keep_dims=True))
-      else:
-        self.target_l4, self.t_w['l4_w'], self.t_w['l4_b'] = \
-            linear(self.target_l3_flat, 512, activation_fn=activation_fn, name='target_l4')
-        self.target_q, self.t_w['q_w'], self.t_w['q_b'] = \
-            linear(self.target_l4, self.env.action_size, name='target_q')
+      self.target_l2, self.t_w['h2_w'], self.t_w['h2_b'] = \
+          linear(self.target_l1, n_hidden_2, name='target-hidden-2')
+      self.target_q, self.t_w['out_w'], self.t_w['out_b'] = \
+          linear(self.target_l1, num_output, name='target-output')
 
       self.target_q_idx = tf.placeholder('int32', [None, None], 'outputs_idx')
       self.target_q_with_idx = tf.gather_nd(self.target_q, self.target_q_idx)
@@ -325,7 +301,7 @@ class Agent(BaseModel):
 
     tf.initialize_all_variables().run()
 
-    self._saver = tf.train.Saver(self.w.values() + [self.step_op], max_to_keep=30)
+    self._saver = tf.train.Saver(list(self.w.values()) + [self.step_op], max_to_keep=30)
 
     self.load_model()
     self.update_target_q_network()
@@ -339,7 +315,8 @@ class Agent(BaseModel):
       os.makedirs(self.weight_dir)
 
     for name in self.w.keys():
-      save_pkl(self.w[name].eval(), os.path.join(self.weight_dir, "%s.pkl" % name))
+      filename = self.env.env_name + '_' + name if not 'share' in name else name
+      save_pkl(self.w[name].eval(), os.path.join(self.weight_dir, "%s.pkl" % filename))
 
   def load_weight_from_pkl(self, cpu_mode=False):
     with tf.variable_scope('load_pred_from_pkl'):
@@ -351,7 +328,8 @@ class Agent(BaseModel):
         self.w_assign_op[name] = self.w[name].assign(self.w_input[name])
 
     for name in self.w.keys():
-      self.w_assign_op[name].eval({self.w_input[name]: load_pkl(os.path.join(self.weight_dir, "%s.pkl" % name))})
+      filename = self.env.env_name + '_' + name if not 'share' in name else name
+      self.w_assign_op[name].eval({self.w_input[name]: load_pkl(os.path.join(self.weight_dir, "%s.pkl" % filename))})
 
     self.update_target_q_network()
 
@@ -368,25 +346,25 @@ class Agent(BaseModel):
 
     test_history = History(self.config)
 
-    if not self.display:
-      gym_dir = '/tmp/%s-%s' % (self.env_name, get_time())
-      self.env.env.monitor.start(gym_dir)
+    # if not self.display:
+    #   gym_dir = '/tmp/%s-%s' % (self.env_name, get_time())
+    #   self.env.env.monitor.start(gym_dir)
 
     best_reward, best_idx = 0, 0
-    for idx in xrange(n_episode):
-      screen, reward, action, terminal = self.env.new_random_game()
+    for idx in range(n_episode):
+      state, reward, action, terminal = self.env.random_new_game()
       current_reward = 0
 
       for _ in range(self.history_length):
-        test_history.add(screen)
+        test_history.add(state)
 
       for t in tqdm(range(n_step), ncols=70):
         # 1. predict
         action = self.predict(test_history.get(), test_ep)
         # 2. act
-        screen, reward, terminal = self.env.act(action, is_training=False)
+        state, reward, terminal = self.env.act(action)
         # 3. observe
-        test_history.add(screen)
+        test_history.add(state)
 
         current_reward += reward
         if terminal:
@@ -400,6 +378,6 @@ class Agent(BaseModel):
       print(" [%d] Best reward : %d" % (best_idx, best_reward))
       print("="*30)
 
-    if not self.display:
-      self.env.env.monitor.close()
+    # if not self.display:
+    #   self.env.env.monitor.close()
       #gym.upload(gym_dir, writeup='https://github.com/devsisters/DQN-tensorflow', api_key='')

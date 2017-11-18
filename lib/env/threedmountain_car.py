@@ -25,6 +25,8 @@ class ThreeDMountainCarEnv(gym.Env):
     }
 
     def __init__(self):
+        self.name = 'ThreeDMountainCar-v0'
+
         self.min_position_x = -1.2
         self.max_position_x = 0.6
         self.max_speed_x = 0.07
@@ -48,6 +50,10 @@ class ThreeDMountainCarEnv(gym.Env):
 
         self._seed()
         self.reset()
+
+    @property
+    def action_size(self):
+        return self.action_space.n
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)

@@ -16,6 +16,8 @@ class MountainCarEnv(gym.Env):
     }
 
     def __init__(self):
+        self.name = 'MountainCar-v0'
+
         self.min_position = -1.2
         self.max_position = 0.6
         self.max_speed = 0.07

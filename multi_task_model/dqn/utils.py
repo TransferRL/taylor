@@ -7,11 +7,11 @@ if (sys.version_info[0]==2):
 elif (sys.version_info[0]==3):
   import _pickle as cPickle
 
-try:
-  from scipy.misc import imresize
-except:
-  import cv2
-  imresize = cv2.resize
+# try:
+#   from scipy.misc import imresize
+# except:
+#   import cv2
+#   imresize = cv2.resize
 
 def rgb2gray(image):
   return np.dot(image[...,:3], [0.299, 0.587, 0.114])
@@ -31,13 +31,13 @@ def get_time():
 
 @timeit
 def save_pkl(obj, path):
-  with open(path, 'w') as f:
+  with open(path, 'wb+') as f:
     cPickle.dump(obj, f)
     print("  [*] save %s" % path)
 
 @timeit
 def load_pkl(path):
-  with open(path) as f:
+  with open(path, 'rb') as f:
     obj = cPickle.load(f)
     print("  [*] load %s" % path)
     return obj

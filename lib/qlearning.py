@@ -205,17 +205,23 @@ class QLearning():
     def play(self):
         self.replay_memory = [] # reset
         # done = 0
-        policy = self.make_epsilon_greedy_policy(self.estimator, 0.3, self.env.action_space.n) #TODO: jm: is this the best way?
+        policy = self.make_epsilon_greedy_policy(self.estimator, 0, self.env.action_space.n) #TODO: jm: is this the best way?
         state = self.env.reset()
         for t in range(100000):
             action_probs = policy(state)
             action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             next_state, reward, done, info = self.env.step(action)
 
+            print('done: {}'.format(done))
+            print('state: {}'.format(next_state))
+            print('action: {}'.format(action))
+
             self.replay_memory.append([state, action, next_state, reward, done])
 
             if self.rendering:
                 self.env.render()
+                self.env.render_y()
+                self.env.render_orthographic()
 
             if done:
                 #print('done: {}'.format(next_state))

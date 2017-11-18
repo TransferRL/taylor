@@ -1,15 +1,22 @@
 import unittest
 import lib.qlearning as ql
+import numpy as np
 import gym
-import lib.env.mountain_car
+from lib.env.threedmountain_car import ThreeDMountainCarEnv
+from lib.env.mountain_car import MountainCarEnv
 
 class MyTestCase(unittest.TestCase):
     def test_qlearning(self):
         # env = gym.envs.make("MountainCar-v0")
-        env = lib.env.mountain_car.MountainCarEnv()
+        # env = lib.env.mountain_car.MountainCarEnv()
+        env = ThreeDMountainCarEnv()
+        # env = MountainCarEnv()
         qlearning = ql.QLearning(env, rendering=True)
-        qlearning.learn()
+        qlearning.learn(num_episodes=200)
         dsource = qlearning.play()
+
+        np.savez('dsource_qlearn_3d.npz', dsource=dsource)
+
         assert(True)
 
 

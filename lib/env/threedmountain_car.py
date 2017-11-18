@@ -28,12 +28,12 @@ class ThreeDMountainCarEnv(gym.Env):
         self.name = 'ThreeDMountainCar-v0'
 
         self.min_position_x = -1.2
-        self.max_position_x = 0.6
+        self.max_position_x = math.pi/6 - 0.1
         self.max_speed_x = 0.07
 
         # jm: The second coordinate bounds
         self.min_position_y = -1.2
-        self.max_position_y = 0.6
+        self.max_position_y = math.pi/6 - 0.1
         self.max_speed_y = 0.07
 
         self.goal_position = 0.5
@@ -278,7 +278,7 @@ class ThreeDMountainCarEnv(gym.Env):
         screen_height = 600
 
         world_height = self.max_position_y - self.min_position_y # same for y
-        scale = (screen_height-100)/world_height
+        scale = (screen_height-120)/world_height
         carwidth=20
         carheight=10
 

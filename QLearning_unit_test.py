@@ -6,6 +6,7 @@ from lib.env.threedmountain_car import ThreeDMountainCarEnv
 from lib.env.mountain_car import MountainCarEnv
 from lib.env.cartpole import CartPoleEnv
 from lib.env.pendulum import PendulumEnv
+from lib.env.atari_env import AtariEnv
 
 class MyTestCase(unittest.TestCase):
     def test_qlearning(self):
@@ -14,7 +15,7 @@ class MyTestCase(unittest.TestCase):
         # env = ThreeDMountainCarEnv()
         # env = MountainCarEnv()
         # env = CartPoleEnv()
-        env = PendulumEnv()
+        env = AtariEnv()
         qlearning = ql.QLearning(env, rendering=True)
         qlearning.learn(num_episodes=100)
         dsource = qlearning.play()

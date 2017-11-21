@@ -220,12 +220,13 @@ class QLearning():
 
             if self.rendering:
                 self.env.render()
-                self.env.render_y()
-                self.env.render_orthographic()
+                # self.env.render_y()
+                # self.env.render_orthographic()
 
             if done:
                 #print('done: {}'.format(next_state))
-                break
+                # break
+                pass
                 #     plt.figure()
                 #     plt.imshow(env.render(mode='rgb_array'))
                     # break

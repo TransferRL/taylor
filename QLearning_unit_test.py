@@ -4,15 +4,19 @@ import numpy as np
 import gym
 from lib.env.threedmountain_car import ThreeDMountainCarEnv
 from lib.env.mountain_car import MountainCarEnv
+from lib.env.cartpole import CartPoleEnv
+from lib.env.pendulum import PendulumEnv
 
 class MyTestCase(unittest.TestCase):
     def test_qlearning(self):
         # env = gym.envs.make("MountainCar-v0")
         # env = lib.env.mountain_car.MountainCarEnv()
-        env = ThreeDMountainCarEnv()
+        # env = ThreeDMountainCarEnv()
         # env = MountainCarEnv()
+        # env = CartPoleEnv()
+        env = PendulumEnv()
         qlearning = ql.QLearning(env, rendering=True)
-        qlearning.learn(num_episodes=200)
+        qlearning.learn(num_episodes=100)
         dsource = qlearning.play()
 
         np.savez('dsource_qlearn_3d.npz', dsource=dsource)

@@ -212,9 +212,9 @@ class QLearning():
             action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             next_state, reward, done, info = self.env.step(action)
 
-            print('done: {}'.format(done))
-            print('state: {}'.format(next_state))
-            print('action: {}'.format(action))
+            # print('done: {}'.format(done))
+            # print('state: {}'.format(next_state))
+            # print('action: {}'.format(action))
 
             self.replay_memory.append([state, action, next_state, reward, done])
 
@@ -224,9 +224,9 @@ class QLearning():
                 # self.env.render_orthographic()
 
             if done:
-                #print('done: {}'.format(next_state))
-                # break
-                pass
+                print('done: {}'.format(next_state))
+                break
+                # pass
                 #     plt.figure()
                 #     plt.imshow(env.render(mode='rgb_array'))
                     # break
